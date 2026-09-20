@@ -4,6 +4,7 @@ import random
 import smtplib
 import pandas as pd
 import datetime as dt
+from email.message import EmailMessage
 
 
 MY_EMAIL = os.environ.get("MY_EMAIL")
@@ -28,7 +29,7 @@ if today_tuple in birthday_dict:
     "letter_templates/letter_2.txt",
     "letter_templates/letter_3.txt"]
     )
-    with open (letter) as file:
+    with open (letter, encoding="utf-8") as file:
         file = file.read()
         content = file.replace("[NAME]", birthday_person["name"])
         print(content)
@@ -40,7 +41,13 @@ if today_tuple in birthday_dict:
     with smtplib.SMTP("smtp.gmail.com", 587) as connection:
         connection.starttls()
         connection.login(senders_mail, password)
-        connection.sendmail(from_addr=senders_mail, to_addrs=receivers_mail,msg=f"Subject: Happy Birthday Dear!\n\n{content}")
+        msg = EmailMessage()
+        msg["Subject"] = "Happy Birthday Dear! 🥳🎂"
+        msg["From"] = senders_mail
+        msg["To"] = receivers_mail
+        msg.set_content(content)
+    
+        connection.send_message(msg)
 
 
 
